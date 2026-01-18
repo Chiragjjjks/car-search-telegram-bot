@@ -1,9 +1,8 @@
-```md
+
 #  Car RAG Telegram Chatbot
 
 A **Retrieval-Augmented Generation (RAG)** based Telegram chatbot that helps users search for cars using **natural language queries**.  
 The bot retrieves **structured car data (price, km, year, fuel, color, etc.) and images strictly from a database** and responds with relevant results via Telegram.
-```
 ##  Use Case
 
 Users can ask queries like:
