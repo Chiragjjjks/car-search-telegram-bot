@@ -1,14 +1,9 @@
-
----
-
 ```md
 #  Car RAG Telegram Chatbot
 
 A **Retrieval-Augmented Generation (RAG)** based Telegram chatbot that helps users search for cars using **natural language queries**.  
 The bot retrieves **structured car data (price, km, year, fuel, color, etc.) and images strictly from a database** and responds with relevant results via Telegram.
-
----
-
+```
 ##  Use Case
 
 Users can ask queries like:
@@ -68,12 +63,9 @@ Telegram Response
 - **FAISS / Vector DB** (optional for semantic search)
 - **FastAPI** (optional backend layer)
 
----
 
 ##  Project Structure
-
 ```
-
 Rag-Car-Search/
 │
 ├── bot/
@@ -100,9 +92,7 @@ Rag-Car-Search/
 ├── requirements.txt
 └── README.md
 
-````
-
----
+```
 
 ## Car Data Schema (Example)
 
@@ -124,7 +114,6 @@ Rag-Car-Search/
 }
 ````
 
----
 
 ## 🔍 Query Flow (RAG Logic)
 
@@ -155,7 +144,6 @@ Rag-Car-Search/
 
 *(Along with car images)*
 
----
 
 ## 🚀 How to Run
 
@@ -194,7 +182,6 @@ MONGO_URI=mongodb://localhost:27017
 python bot/telegram_bot.py
 ```
 
----
 
 ##  Data Safety
 
@@ -226,7 +213,5 @@ AI / ML | Backend | RAG Systems
 If you find this project useful, please ⭐ the repository!
 
 ```
-
----
 
 ```  
