@@ -1,0 +1,5 @@
+python-telegram-bot==20.7
+pymongo
+sentence-transformers
+faiss-cpu
+numpy
