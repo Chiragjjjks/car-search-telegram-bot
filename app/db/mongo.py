@@ -1,6 +1,6 @@
 
 from pymongo import MongoClient
-from settings import MONGO_URI, DB_NAME, COLLECTION_NAME
+from app.config.settings import MONGO_URI, DB_NAME, COLLECTION_NAME
 
 
 def get_cars_collection():
