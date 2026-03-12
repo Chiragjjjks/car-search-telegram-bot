@@ -1,216 +1,174 @@
+# 🚗 car-search-telegram-bot
 
-#  Car RAG Telegram Chatbot
-
-A **Retrieval-Augmented Generation (RAG)** based Telegram chatbot that helps users search for cars using **natural language queries**.  
-The bot retrieves **structured car data (price, km, year, fuel, color, etc.) and images strictly from a database** and responds with relevant results via Telegram.
-##  Use Case
-
-Users can ask queries like:
-
-- **"White car under 5 lakhs"**
-- **"Diesel sedan below 1 lakh km"**
-- **"Red automatic car"**
-
-The chatbot:
-1. Understands the user intent using an **LLM**
-2. Converts the query into structured filters
-3. Retrieves **only existing car metadata and images from the database**
-4. Sends results back to the user via **Telegram Bot API**
-
-**No hallucinated data** — all responses are grounded in the database.
+A Telegram bot that helps users find used cars from a MongoDB inventory using natural language keyword matching — no AI APIs required.
 
 ---
 
-## Architecture Overview
+## 💡 How It Works
 
-```
+User sends a message like:
+> *"I need a diesel car under 5 lakh"*
 
-User (Telegram)
-      |
-      v
-Telegram Bot API
-      |
-      v
-Query Parser (LLM)
-      |
-      v
-Structured Filters (price, color, km, fuel...)
-      |
-      v
-Vector / Metadata Search (RAG)
-      |
-      v
-Database (MongoDB)
-      |
-      v
-Images + Car Metadata
-      |
-      v  
-Telegram Response
-
-```
+The bot:
+1. Extracts filters using keyword matching (`diesel` → fuel type, `5 lakh` → price limit)
+2. Queries MongoDB for matching cars with `status: not_sold`
+3. Replies with matching car details and photos
 
 ---
 
-##  Tech Stack
+## 🗂️ Project Structure
 
-- **Python**
-- **Telegram Bot API**
-- **LLM (OpenAI / Local LLM)**
-- **RAG Pipeline**
-- **MongoDB** (car metadata & image paths)
-- **FAISS / Vector DB** (optional for semantic search)
-- **FastAPI** (optional backend layer)
-
-
-##  Project Structure
 ```
-Rag-Car-Search/
-│
-├── bot/
-│   ├── telegram_bot.py        # Telegram bot entry point
-│   ├── handlers.py            # Message handlers
-│
-├── rag/
-│   ├── query_parser.py        # Converts user text to filters
-│   ├── retriever.py           # Retrieves cars from DB
-│
-├── db/
-│   ├── mongo.py               # MongoDB connection
-│   ├── schema.py              # Car schema
-│
-├── data/
-│   ├── images/                # Car images
-│   ├── cars.json              # Sample car metadata
-│
-├── utils/
-│   ├── normalizer.py          # Text normalization
-│
-├── .env                       # Environment variables
-├── .gitignore
+car-search-telegram-bot/
+├── app/
+│   ├── config/
+│   │   └── settings.py          # Env vars (Mongo URI, Telegram token, etc.)
+│   ├── db/
+│   │   └── mongo.py             # MongoDB connection
+│   ├── filters/
+│   │   ├── parser.py            # Keyword extraction from user text
+│   │   └── apply.py             # Apply extracted filters to car list
+│   └── services/
+│       └── car_service.py       # Query MongoDB, return matching cars
+├── ingest.py                    # One-time script: local folders → Cloudinary + MongoDB
+├── bot.py                       # Telegram bot entry point
+├── .env                         # Your secrets (never commit this)
 ├── requirements.txt
 └── README.md
-
 ```
-
-## Car Data Schema (Example)
-
-```json
-{
-  "brand": "Honda",
-  "model": "City",
-  "year": 2014,
-  "fuel": "Diesel",
-  "color": "White",
-  "km": 99000,
-  "price": 425000,
-  "ownership": "Second",
-  "images": [
-    "images/honda_city_1.jpg",
-    "images/honda_city_2.jpg"
-  ],
-  "status": "available"
-}
-````
-
-
-## 🔍 Query Flow (RAG Logic)
-
-1. User sends a message via Telegram
-2. LLM extracts intent and constraints
-3. Query is converted into:
-
-   * Price range
-   * Color
-   * Fuel type
-   * Kilometer limit
-4. MongoDB is queried using structured filters
-5. Matching car metadata + images are retrieved
-6. Results are formatted and sent back to the user
 
 ---
 
-## 📸 Telegram Response Example
+## ⚙️ Setup
 
-```
-🚗 Honda City (2014)
-💰 Price: ₹4,25,000
-🛣️ KM Driven: 99,000
-⛽ Fuel: Diesel
-🎨 Color: White
-👤 Owner: Second
-```
-
-*(Along with car images)*
-
-
-## 🚀 How to Run
-
-### 1️ Clone the repo
+### 1. Clone the repo
 
 ```bash
-git clone https://github.com/Chiragjjjks/Rag-Car-Search.git
-cd Rag-Car-Search
+git clone https://github.com/your-username/car-search-telegram-bot.git
+cd car-search-telegram-bot
 ```
 
-###  Create virtual environment
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-```
-
-### 3️ Install dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4️ Set environment variables
-
-Create `.env` file:
+### 3. Create a `.env` file
 
 ```env
-TELEGRAM_BOT_TOKEN=your_token_here
+TELEGRAM_TOKEN=your_telegram_bot_token
 MONGO_URI=mongodb://localhost:27017
+DB_NAME=cars_db
+COLLECTION_NAME=cars
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-### 5️ Run the bot
+### 4. Ingest car data into MongoDB
+
+Organise your car folders like this:
+
+```
+Cars/
+  Ertiga-Vxi-O/
+    metadata.json
+    images/
+      1.jpeg
+      2.jpeg
+      ...
+```
+
+Each `metadata.json` should follow this structure:
+
+```json
+{
+  "brand": "Maruti",
+  "model": "Ertiga",
+  "variant": "VXI (O)",
+  "year": 2022,
+  "fuel_type": "petrol",
+  "transmission": "manual",
+  "km_driven": 31400,
+  "price": 1100000,
+  "owner_count": 1,
+  "body_type": "MPV",
+  "segment": "MPV",
+  "seat_count": 7,
+  "engine_cc": 1462,
+  "mileage_kmpl": 20.5,
+  "airbags": 2,
+  "tags": ["family_car", "7_seater", "low_km"],
+  "description": "Maruti Ertiga VXI(O) petrol 7 seater MPV."
+}
+```
+
+Then run:
 
 ```bash
-python bot/telegram_bot.py
+python ingest.py --cars-dir "C:/path/to/Cars"
 ```
 
+This uploads images to Cloudinary and inserts each car into MongoDB with `status: not_sold`.
 
-##  Data Safety
+### 5. Run the bot
 
-* All responses are **retrieved from database only**
-* No generated or fabricated car details
-* Images are served from stored paths
-
----
-
-## Future Enhancements
-
-* Semantic search using FAISS
-* Multi-image carousel support
-* User preference memory
-* Admin dashboard for car uploads
-* Multi-language support
-
----
-
-##  Author
-
-**Chirag S**
-AI / ML | Backend | RAG Systems
-
----
-
-##  Star the Repo
-
-If you find this project useful, please ⭐ the repository!
-
+```bash
+python bot.py
 ```
 
-```  
+---
+
+## 🔍 Supported Keyword Filters
+
+| What user says | Filter applied |
+|---|---|
+| `diesel`, `petrol`, `cng` | `fuel_type` |
+| `automatic`, `manual` | `transmission` |
+| `under 5L`, `less than 5 lakh`, `below 5 lakh` | `price <` |
+| `honda`, `maruti`, `hyundai` | `brand` |
+| `sedan`, `hatchback`, `MPV`, `van` | `body_type` |
+| `7 seater`, `5 seater` | `seat_count` |
+| `low km`, `under 50000 km` | `km_driven` |
+| `first owner`, `single owner` | `owner_count` |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Python** — bot logic and ingestion script
+- **python-telegram-bot** — Telegram bot framework
+- **MongoDB** — car inventory database
+- **Cloudinary** — image storage and delivery
+- **Keyword Matching** — rule-based NLP filter extraction (no external AI APIs)
+
+---
+
+## 📦 requirements.txt
+
+```
+python-telegram-bot==20.7
+pymongo==4.6.1
+cloudinary==1.36.0
+python-dotenv==1.0.0
+```
+
+---
+
+## 🚧 Roadmap
+
+- [x] Keyword-based filter extraction
+- [x] MongoDB car search
+- [x] Cloudinary image storage
+- [x] Telegram bot replies with car details
+- [ ] Send car photos via Telegram
+- [ ] Multi-filter support (e.g. diesel + under 5L + automatic)
+- [ ] `/list` command to browse all available cars
+- [ ] Mark car as sold via admin command
+
+---
+
+## 📄 License
+
+MIT

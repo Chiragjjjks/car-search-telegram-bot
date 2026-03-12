@@ -14,27 +14,27 @@ def apply_filters(cars: list, filters: dict) -> list:
     filtered_cars = []
 
     for car in cars:
-        # 🔹 Price filter
+        # Price filter
         if filters.get("max_price") is not None:
             if car.get("price", 0) > filters["max_price"]:
                 continue
 
-        # 🔹 Color filter
+        # Color filter
         if filters.get("color") is not None:
             if car.get("color", "").lower() != filters["color"]:
                 continue
 
-        # 🔹 Fuel filter
+        # Fuel filter
         if filters.get("fuel") is not None:
             if car.get("fuel", "").lower() != filters["fuel"]:
                 continue
 
-        # 🔹 KM filter
+        # KM filter
         if filters.get("max_km") is not None:
             if car.get("km", 0) > filters["max_km"]:
                 continue
 
-        # ✅ Passed all filters
+        # Passed all filters
         filtered_cars.append(car)
 
     return filtered_cars

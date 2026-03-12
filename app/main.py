@@ -13,11 +13,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = update.message.text
     print("📩 User:", user_text)
 
-    # 1️⃣ Parse filters
+    #  Parse filters
     filters_extracted = parse_filters(user_text)
-    print("🧠 Filters:", filters_extracted)
+    print(" Filters:", filters_extracted)
 
-    # 2️⃣ Retrieve from MongoDB
+    #  Retrieve from MongoDB
     cars = search_cars(filters_extracted)
 
     if not cars:
